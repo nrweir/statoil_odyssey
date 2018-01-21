@@ -45,17 +45,18 @@ for layer in vgg.layers:
 x = vgg.output
 x = Flatten()(x)
 x = Dense(1024, activation='relu')(x)
-x = Dropout(0.5)(x)
+x = Dropout(0.25)(x)
 x = Dense(1024, activation='relu')(x)
+x = Dropout(0.25)(x)
 pred = Dense(1, activation='sigmoid')(x)
 
 model_final = Model(input = vgg.input, output=pred)
 
-model_final.compile(loss = 'binary_crossentropy', optimizer=optimizers.SGD(lr=0.001, momentum=0.9), metrics=['accuracy'])
+model_final.compile(loss = 'binary_crossentropy', optimizer=optimizers.adam(lr=0.0001), metrics=['accuracy'])
 
 checkpoint = ModelCheckpoint("vgg19_{epoch:02d}-{val_loss:.3f}.h5", monitor='val_loss', verbose=1, save_best_only=True, save_weights_only=False, mode='auto', period=1)
-early = EarlyStopping(monitor='val_loss', min_delta=0, patience=20, verbose=1, mode='auto')
+early = EarlyStopping(monitor='val_loss', min_delta=0, patience=50, verbose=1, mode='auto')
 model_final.summary()
-model_final.fit(norm_w_flips, y_train, batch_size=32, epochs=100, verbose=2,
+model_final.fit(norm_w_flips, y_train, batch_size=32, epochs=5000, verbose=2,
                                         validation_split = 0.2,
                                         callbacks = [checkpoint, early])
