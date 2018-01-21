@@ -39,7 +39,7 @@ norm_w_flips = np.append(norm_w_flips, np.zeros((1604,75,75,1)), axis=3)
 
 vgg = applications.VGG19(weights = 'imagenet', include_top=False, input_shape=(75,75,3))
 
-for layer in vgg.layers:
+for layer in vgg.layers[:-5]:
     layer.trainable = False
 
 x = vgg.output
@@ -54,7 +54,7 @@ model_final = Model(input = vgg.input, output=pred)
 
 model_final.compile(loss = 'binary_crossentropy', optimizer=optimizers.adam(lr=0.0001), metrics=['accuracy'])
 
-checkpoint = ModelCheckpoint("vgg19_{epoch:02d}-{val_loss:.3f}.h5", monitor='val_loss', verbose=1, save_best_only=True, save_weights_only=False, mode='auto', period=1)
+checkpoint = ModelCheckpoint("vgg19_train-block5_{epoch:02d}-{val_loss:.3f}.h5", monitor='val_loss', verbose=1, save_best_only=True, save_weights_only=False, mode='auto', period=1)
 early = EarlyStopping(monitor='val_loss', min_delta=0, patience=50, verbose=1, mode='auto')
 model_final.summary()
 model_final.fit(norm_w_flips, y_train, batch_size=32, epochs=5000, verbose=2,
