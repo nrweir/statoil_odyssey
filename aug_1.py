@@ -103,34 +103,33 @@ def Model_3(conv_depth=32, lr = 0.001, use_dropout=True, dropout_p=0.25,
 current_gmodel=Model_3(conv_depth=32, lr=0.0001, use_dropout=True, dropout_p = 0.18)
 
 batch_size = 32
-
-
 norm_w_add = x_train
 add_arr = norm_w_add[:,:,:,0] + norm_w_add[:,:,:,1]
 add_arr = add_arr[:,:,:,np.newaxis]
 norm_w_add = np.append(norm_w_add, add_arr, axis=3)
-X_tr, X_val, y_tr, y_val = train_test_split(norm_w_add, y_train, test_size=.2, random_state=42)
 
-train_datagen = ImageDataGenerator(
-        horizontal_flip=True,
-        vertical_flip=True)
+for s in range(0,10):
+    X_tr, X_val, y_tr, y_val = train_test_split(norm_w_add, y_train, test_size=.2, random_state=s)
 
-test_datagen = ImageDataGenerator()
+    train_datagen = ImageDataGenerator(
+            horizontal_flip=True,
+            vertical_flip=True)
 
-train_generator = train_datagen.flow(X_tr, y_tr,
-        batch_size=batch_size)
+    test_datagen = ImageDataGenerator()
 
-validation_generator = test_datagen.flow(X_val, y_val,
-        batch_size=batch_size)
+    train_generator = train_datagen.flow(X_tr, y_tr,
+            batch_size=batch_size)
 
-current_gmodel.fit_generator(
-    train_generator,
-    steps_per_epoch=(norm_w_add.shape[0]/batch_size),
-    epochs=200,
-    verbose=2,
-    validation_data=validation_generator,
-    validation_steps=50,
-    callbacks=[ModelCheckpoint(filepath="aug1-neg3lr-18dropout-32cd-{epoch:02d}-{val_loss:.3f}.hdf5",
-                                     save_best_only=True),
-                     EarlyStopping(patience=50),
-                    ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=20, verbose=1, epsilon=1e-4, mode='min')])
+    validation_generator = test_datagen.flow(X_val, y_val,
+            batch_size=batch_size)
+
+    current_gmodel.fit_generator(
+        train_generator,
+        steps_per_epoch=(norm_w_add.shape[0]/batch_size),
+        epochs=200,
+        verbose=2,
+        validation_data=validation_generator,
+        validation_steps=50,
+        callbacks=[ModelCheckpoint(filepath="aug1-seed" + str(s) + "-neg3lr-18dropout-32cd-{epoch:02d}-{val_loss:.3f}.hdf5", save_best_only=True),
+                         EarlyStopping(patience=50),
+                        ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=20, verbose=1, epsilon=1e-4, mode='min')])
