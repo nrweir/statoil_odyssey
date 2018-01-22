@@ -30,7 +30,7 @@ os.chdir('/n/denic_lab/Users/nweir/statoil_odyssey/')
 x_train = np.load('norm_im_arr.npy')
 y_train = np.load('training_labs.npy')
 
-def Model_3(conv_depth=32, lr = 0.001, use_dropout=True, dropout_p=0.2,
+def Model_3(conv_depth=32, lr = 0.001, use_dropout=True, dropout_p=0.25,
              conv_reg=0, dense_reg=0, adam_decay=0):
     #Building the model
     gmodel=Sequential()
@@ -133,4 +133,4 @@ current_gmodel.fit_generator(
     callbacks=[ModelCheckpoint(filepath="aug1-neg3lr-18dropout-32cd-{epoch:02d}-{val_loss:.3f}.hdf5",
                                      save_best_only=True),
                      EarlyStopping(patience=50),
-                    ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=10, verbose=1, epsilon=1e-4, mode='min')])
+                    ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=20, verbose=1, epsilon=1e-4, mode='min')])
